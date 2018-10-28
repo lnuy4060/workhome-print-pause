@@ -1,6 +1,5 @@
 package com.jiayu.workhome;
 
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -23,51 +22,51 @@ public class WorkhomeController {
     @FXML
     private Text tipMsgText;
 
-    final  AtomicBoolean  pauseFlag=new AtomicBoolean(false);
-    final AtomicInteger count=new AtomicInteger(0);
+    final AtomicBoolean pauseFlag = new AtomicBoolean(false);
+    final AtomicInteger count = new AtomicInteger(0);
 
     @FXML
-    public void pausePrint(ActionEvent actionEvent){
-        if(pauseFlag.get()){
+    public void pausePrint(ActionEvent actionEvent) {
+        if (pauseFlag.get()) {
             pauseFlag.set(Boolean.FALSE);
             pausePrintBtn.setText("暂停");
-            synchronized (pauseFlag){
+            synchronized (pauseFlag) {
                 pauseFlag.notifyAll();
             }
-        }else {
+        } else {
             pauseFlag.set(Boolean.TRUE);
             pausePrintBtn.setText("继续");
         }
     }
 
     @FXML
-    public void startPrint(ActionEvent actionEvent){
+    public void startPrint(ActionEvent actionEvent) {
         startPrintBtn.setDisable(true);
         pausePrintBtn.setDisable(false);
         new Thread(new Runnable() {
             @Override
             public void run() {
-                    while (true){
-                        tipMsgText.setText(String.valueOf(count.get()));
+                while (true) {
+                    tipMsgText.setText(String.valueOf(count.get()));
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if (pauseFlag.get()) {
                         try {
-                            Thread.sleep(3000);
+                            synchronized (pauseFlag) {
+                                pauseFlag.wait();
+                            }
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        if(pauseFlag.get()){
-                            try {
-                                synchronized (pauseFlag){
-                                    pauseFlag.wait();
-                                }
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        count.incrementAndGet();
-
-                        System.out.println(count.get());
                     }
+                    count.incrementAndGet();
+
+                    System.out.println(count.get());
                 }
+            }
         }).start();
 
     }
