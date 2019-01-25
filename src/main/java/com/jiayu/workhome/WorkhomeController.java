@@ -63,10 +63,8 @@ public class WorkhomeController {
                         }
                     }
                     count.incrementAndGet();
+                    System.out.println(1111);
 
-
-
-                    System.out.println(count.get());
                 }
             }
         }).start();
