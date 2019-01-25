@@ -64,6 +64,8 @@ public class WorkhomeController {
                     }
                     count.incrementAndGet();
 
+
+
                     System.out.println(count.get());
                 }
             }
